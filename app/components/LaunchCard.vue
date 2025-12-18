@@ -23,7 +23,7 @@
       
       <div class="mb-2">
         <v-icon size="small" class="mr-2">mdi-rocket</v-icon>
-        <strong>Rocket:</strong> {{ launch.rocket?.rocket_name || 'N/A' }}
+        <strong>Rocket:</strong> {{ launch.rocket?.rocket_name || launch.rocket?.rocket?.name || 'N/A' }}
       </div>
       
       <div v-if="launch.details" class="mt-3">
@@ -91,6 +91,7 @@ const launchId = computed(() => props.launch.id)
 const rocketId = computed(() => {
   return props.launch.rocket?.rocket?.id || null
 })
+
 
 
 const handleToggle = () => {

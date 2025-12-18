@@ -26,9 +26,12 @@ export const useSpaceXLaunches = () => {
   `
 
 
-  const { result, loading, error, refetch } = useQuery(GET_LAUNCHES, {}, {
-  fetchPolicy: 'network-only', // always fetch fresh data
-})
+// With this:
+const { result, loading, error, refetch } = useQuery(GET_LAUNCHES, {}, () => ({
+  fetchPolicy: 'network-only',
+  enabled: process.client, // only fetch on client
+}))
+
 
 
   const launches = computed(() => {
