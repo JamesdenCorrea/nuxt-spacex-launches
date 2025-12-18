@@ -1,6 +1,6 @@
 import { useQuery } from '#imports'
 import gql from 'graphql-tag'
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 
 export const useSpaceXLaunches = () => {
   const GET_LAUNCHES = gql`
@@ -17,11 +17,22 @@ export const useSpaceXLaunches = () => {
     }
   `
 
-  const { result, loading, error, refetch } = useQuery(GET_LAUNCHES, {}, {
-    fetchPolicy: 'network-only', // always fetch fresh data
-  })
+  // Only enable query on client-side
+  const enabled = ref(false)
+
+  if (process.client) enabled.value = true
+
+  const { result, loading, error, refetch } = useQuery(
+    GET_LAUNCHES,
+    {},
+    () => ({
+      enabled: enabled.value,       // <-- Only fetch on client
+      fetchPolicy: 'network-only',  // always fetch fresh data
+    })
+  )
 
   const launches = computed(() => result.value?.launchesPast ?? [])
 
   return { launches, loading, error, refetch }
 }
+
