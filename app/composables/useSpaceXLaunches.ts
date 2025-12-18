@@ -1,7 +1,8 @@
 // app/composables/useSpaceXLaunches.ts
 import { useQuery } from '#imports'
 import gql from 'graphql-tag'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import type { ApolloError } from '@apollo/client/core'
 
 export const useSpaceXLaunches = () => {
   const GET_LAUNCHES = gql`
@@ -18,30 +19,21 @@ export const useSpaceXLaunches = () => {
     }
   `
 
-  // Only fetch on client to avoid SSR issues
-  const enabled = process.client
+  // SSR-safe: initialize refs with proper types
+  let result = ref<any>(null)
+  let loading = ref<boolean>(false)
+  let error = ref<ApolloError | null>(null)
+  let refetch: (() => void) = () => {}
 
-  const { result, loading, error, refetch } = useQuery(
-    GET_LAUNCHES,
-    {},
-    () => ({
-      fetchPolicy: 'network-only', // always fetch fresh data
-      enabled,                      // only fetch on client
-    })
-  )
+  if (process.client) {
+    const queryResult = useQuery(GET_LAUNCHES, {}, { fetchPolicy: 'network-only' })
+    result = queryResult.result
+    loading = queryResult.loading
+    error = queryResult.error
+    refetch = queryResult.refetch
+  }
 
-  // Computed launches list
-  const launches = computed(() => {
-    const data = result.value?.launchesPast ?? []
-
-    // Optional: debug log
-    if (data.length > 0 && process.client) {
-      console.log('🔄 Sample launch:', data[0])
-      console.log('Rocket ID:', data[0].rocket?.rocket?.id)
-    }
-
-    return data
-  })
+  const launches = computed(() => result.value?.launchesPast ?? [])
 
   return { launches, loading, error, refetch }
 }

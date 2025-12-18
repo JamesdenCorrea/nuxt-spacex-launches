@@ -12,11 +12,17 @@ export default defineNuxtConfig({
 
   apollo: {
     autoImports: true,
-    proxyCookies: false, // updated from your previous true
+    proxyCookies: false,
     cookieAttributes: { secure: false },
     clients: {
       default: {
         httpEndpoint: 'https://api.spacex.land/graphql/',
+      },
+    },
+    // Use correct property name
+    defaultOptions: {
+      query: {
+        fetchPolicy: 'network-only', // always fetch fresh data
       },
     },
   },
@@ -31,3 +37,4 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-11',
   ssr: true,
 })
+

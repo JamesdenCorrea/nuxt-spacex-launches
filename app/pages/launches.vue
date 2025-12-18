@@ -33,12 +33,11 @@
             cols="12"
             md="4"
           >
-<LaunchCard
-  :launch="launch"
-  :isFavorite="favoritesStore.isFavorite(launch.id)"
-  @toggle-favorite="handleToggleFavorite"
-/>
-
+            <LaunchCard
+              :launch="launch"
+              :isFavorite="favoritesStore.isFavorite(launch.id)"
+              @toggle-favorite="handleToggleFavorite"
+            />
           </v-col>
         </template>
       </v-row>
@@ -69,8 +68,7 @@ const handleToggleFavorite = (payload: { launchId: string; launch: any }) => {
   }
 }
 
-
-// Optional: helper function for formatting dates (if used inside LaunchCard)
+// Optional: helper function for formatting dates
 const formatDate = (date: string) => {
   try {
     return new Date(date).toLocaleDateString('en-US', {
