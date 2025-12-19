@@ -1,8 +1,5 @@
-// app/composables/useSpaceXLaunches.ts
-import { useQuery } from '#imports'
+import { useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
-import { computed, ref } from 'vue'
-import type { ApolloError } from '@apollo/client/core'
 
 export const useSpaceXLaunches = () => {
   const GET_LAUNCHES = gql`
@@ -11,29 +8,59 @@ export const useSpaceXLaunches = () => {
         id
         mission_name
         launch_date_local
-        launch_site { site_name }
-        rocket { rocket_name rocket { id name } }
+        launch_site {
+          site_name
+        }
+        rocket {
+          rocket_name
+          rocket {
+            id
+            name
+          }
+        }
         details
-        links { mission_patch_small }
+        links {
+          mission_patch_small
+        }
       }
     }
   `
 
-  // SSR-safe: initialize refs with proper types
-  let result = ref<any>(null)
-  let loading = ref<boolean>(false)
-  let error = ref<ApolloError | null>(null)
-  let refetch: (() => void) = () => {}
+  // Only run query on client
+  const enabled = computed(() => process.client)
 
-  if (process.client) {
-    const queryResult = useQuery(GET_LAUNCHES, {}, { fetchPolicy: 'network-only' })
-    result = queryResult.result
-    loading = queryResult.loading
-    error = queryResult.error
-    refetch = queryResult.refetch
+  const { result, loading, error, refetch } = useQuery(
+    GET_LAUNCHES,
+    {},
+    () => ({
+      enabled: enabled.value,
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    })
+  )
+
+  const launches = computed(() => {
+    const data = result.value?.launchesPast ?? []
+    
+    // Debug logging
+    if (process.client) {
+      console.log('📊 Query result:', result.value)
+      console.log('✅ Launches count:', data.length)
+      if (data.length > 0) {
+        console.log('🚀 Sample launch:', data[0])
+      }
+      if (error.value) {
+        console.error('❌ Query error:', error.value)
+      }
+    }
+    
+    return data
+  })
+
+  return {
+    launches,
+    loading,
+    error,
+    refetch
   }
-
-  const launches = computed(() => result.value?.launchesPast ?? [])
-
-  return { launches, loading, error, refetch }
 }
