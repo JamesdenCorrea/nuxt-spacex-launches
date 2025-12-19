@@ -22,9 +22,8 @@ export default defineNuxtConfig({
     cookieAttributes: { secure: false },
     clients: {
       default: {
-        httpEndpoint: 'https://api.spacex.land/graphql/',
-        // Add these for better compatibility
-        browserHttpEndpoint: 'https://api.spacex.land/graphql/',
+httpEndpoint: 'https://spacex-production.up.railway.app/',
+browserHttpEndpoint: 'https://spacex-production.up.railway.app/',
         // Disable SSR fetch
         tokenStorage: 'cookie',
       },

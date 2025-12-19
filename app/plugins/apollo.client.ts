@@ -6,7 +6,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (process.server) return
 
   const httpLink = new HttpLink({
-    uri: 'https://api.spacex.land/graphql/', // Match nuxt.config.ts
+    uri: 'https://spacex-production.up.railway.app/', // Match nuxt.config.ts
     fetch: fetch,
   })
 
